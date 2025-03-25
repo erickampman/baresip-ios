@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21
+  },
+  "configurePresets": [
+    {
+      "name": "ios-xcode",
+      "displayName": "iOS Xcode Project",
+      "generator": "Xcode",
+      "description": "Build baresip for iOS using re-ios as a subproject",
+      "binaryDir": "${sourceDir}/build-ios-baresip",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake/ios.toolchain.cmake",
+        "STATIC": "ON"
+      }
+    }
+  ]
+}
+

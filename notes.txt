@@ -1,0 +1,5 @@
+rm -rf build-ios-baresip
+cmake --preset ios-xcode
+open build-ios-baresip/baresip-ios.xcodeproj
+
+

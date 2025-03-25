@@ -34,20 +34,29 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 # Module/Package Includes
 #
 
+option(AUTODETECT_MODULES "Autodetect modules" OFF)
+
+set(MODULES
+  contact
+  coreaudio
+  g711
+  srtp
+  uuid
+)
+
+
 include(GNUInstallDirs)
 include(CheckIncludeFile)
-find_package(RE REQUIRED)
+# find_package(RE REQUIRED) # not the way I'm doing it. ELK
 
 ##############################################################################
 #
 # Compile options
 #
 
-if(WIN32)
-  option(STATIC "Build static" ON)
-else()
-  option(STATIC "Build static" OFF)
-endif()
+# Modified so always building static lib
+option(STATIC "Build static" ON)
+
 
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -97,7 +106,7 @@ endif()
 
 
 
-find_package(re CONFIG REQUIRED HINTS ../re/cmake)
+# find_package(re CONFIG REQUIRED HINTS ../re/cmake) # Not the way I'm doing it. ELK
 
 list(APPEND RE_DEFINITIONS
   VERSION="${PROJECT_VERSION_FULL}"
@@ -258,7 +267,9 @@ endif()
 # Main target library
 #
 
-set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
+# set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
+set(LINKLIBS re) # as per chatGPT
+
 
 if(WIN32)
   list(APPEND LINKLIBS winmm gdi32 crypt32 strmiids ole32 oleaut32)
@@ -266,8 +277,11 @@ endif()
 
 if(STATIC)
   add_library(baresip STATIC ${SRCS} ${HEADERS})
-  target_link_libraries(baresip PUBLIC ${LINKLIBS} ${MODULES_DETECTED})
   target_include_directories(baresip PUBLIC include)
+  target_include_directories(baresip PRIVATE ../re-ios/include)
+  target_link_libraries(baresip PRIVATE re ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+  # target_link_libraries(baresip PUBLIC ${LINKLIBS} ${MODULES_DETECTED})
+  # target_include_directories(baresip PUBLIC include)
 else()
   add_library(baresip SHARED ${SRCS} ${HEADERS})
   target_link_libraries(baresip PRIVATE ${LINKLIBS})
@@ -349,7 +363,7 @@ endif()
 # Install section
 #
 
-install(TARGETS baresip_exe baresip
+install(TARGETS baresip
   RUNTIME
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT Applications
