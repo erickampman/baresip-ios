@@ -61,3 +61,18 @@ install_manifest.txt
 
 # Visual Studio Code
 .vscode/*
+
+# Build folders
+build*/
+*.xcodeproj
+*.xcworkspace
+
+# Xcode cruft
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+
+# macOS system files
+.DS_Store
