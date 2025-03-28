@@ -9,9 +9,9 @@ Baresip is a portable and modular SIP User-Agent with audio and video support.
 Copyright (c) 2010 - 2025 Alfred E. Heggestad and Contributors  
 Distributed under BSD license
 
-## Notes for re-ios (Eric Kampman fork)
+## Notes for baresip-ios (Eric Kampman fork)
 This is not, and is not intended to be, a complete port. 
-I need only SIP and RTP support (and encrypted versions thereof. 
+I need only SIP and RTP support (and encrypted versions thereof). 
 - 2025-03-28 -- libre.a is successfully built. See notes.txt for build instructions.
 
 ![Build](https://github.com/baresip/baresip/workflows/Build/badge.svg)
