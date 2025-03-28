@@ -31,6 +31,12 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 ##############################################################################
 #
+# ELK ... I dunno about this. Not sure iOS has this.
+#
+add_definitions(-DHAVE_UNISTD_H)
+
+##############################################################################
+#
 # Module/Package Includes
 #
 
@@ -118,12 +124,12 @@ list(APPEND RE_DEFINITIONS
 
 add_compile_definitions(${RE_DEFINITIONS})
 
-include_directories(
-  include
-  src
-  ${RE_INCLUDE_DIRS}
-  ${OPENSSL_INCLUDE_DIR}
-)
+# include_directories(
+#   include
+#   src
+#   ${RE_INCLUDE_DIRS}
+#   ${OPENSSL_INCLUDE_DIR}
+# )
 
 if(MOD_PATH)
   add_definitions(-DMOD_PATH="${MOD_PATH}")
@@ -224,6 +230,13 @@ set(MODULES_DETECTED "")
 
 foreach(mod IN LISTS MODULES)
   add_subdirectory(modules/${mod})
+
+  if(TARGET ${mod})
+    target_include_directories(${mod} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../re-ios/include
+    )
+  endif()
 endforeach()
 
 foreach(mod IN LISTS APP_MODULES)
@@ -267,49 +280,42 @@ endif()
 # Main target library
 #
 
-# set(LINKLIBS ${RE_LIBRARIES} ${RE_LIBS})
 set(LINKLIBS re) # as per chatGPT
 
+add_library(baresip STATIC ${SRCS} ${HEADERS})
 
-if(WIN32)
-  list(APPEND LINKLIBS winmm gdi32 crypt32 strmiids ole32 oleaut32)
-endif()
+# Include paths
+target_include_directories(baresip PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../re-ios/include>
+  $<INSTALL_INTERFACE:include>
+)
 
-if(STATIC)
-  add_library(baresip STATIC ${SRCS} ${HEADERS})
-  target_include_directories(baresip PUBLIC include)
-  target_include_directories(baresip PRIVATE ../re-ios/include)
-  target_link_libraries(baresip PRIVATE re ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
-  # target_link_libraries(baresip PUBLIC ${LINKLIBS} ${MODULES_DETECTED})
-  # target_include_directories(baresip PUBLIC include)
-else()
-  add_library(baresip SHARED ${SRCS} ${HEADERS})
-  target_link_libraries(baresip PRIVATE ${LINKLIBS})
-  set_target_properties(baresip PROPERTIES VERSION
-    ${PROJECT_SOVERSION}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
-  set_target_properties(baresip PROPERTIES SOVERSION ${PROJECT_SOVERSION})
-endif()
+# Link against re and OpenSSL
+target_link_libraries(baresip PRIVATE
+  re
+  ${OPENSSL_SSL_LIBRARY}
+  ${OPENSSL_CRYPTO_LIBRARY}
+)
 
-if(MSVC)
-  set_target_properties(baresip PROPERTIES OUTPUT_NAME "libbaresip")
-endif()
+# Archiving settings
+set_target_properties(baresip PROPERTIES
+  OUTPUT_NAME "baresip"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Release"
+  POSITION_INDEPENDENT_CODE ON
+  XCODE_GENERATE_SCHEME TRUE
+  PUBLIC_HEADER "${HEADERS}"
+)
 
-set_target_properties(baresip PROPERTIES POSITION_INDEPENDENT_CODE ON)
+# Optional: Alias + install support
+add_library(baresip::baresip ALIAS baresip)
+add_custom_target(build-baresip ALL DEPENDS baresip)
+list(APPEND BARESIP_INSTALL_TARGETS baresip)
 
-set_target_properties(baresip PROPERTIES PUBLIC_HEADER "${HEADERS}")
-
-
-##############################################################################
-#
-# Target baresip executable
-#
-
-add_executable(baresip_exe src/main.c)
-
-set_target_properties(baresip_exe PROPERTIES OUTPUT_NAME baresip)
-
-target_link_libraries(baresip_exe PRIVATE baresip ${LINKLIBS})
-
+install(TARGETS baresip
+  ARCHIVE DESTINATION lib
+  PUBLIC_HEADER DESTINATION include
+)
 
 ##############################################################################
 #
@@ -322,41 +328,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libbaresip.pc
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
   COMPONENT Development
 )
-
-
-##############################################################################
-# Test and webrtc
-#
-
-add_subdirectory(webrtc)
-add_subdirectory(test)
-
-
-##############################################################################
-# Symlink modules to build dir (needed for test and baresip_exe)
-#
-
-if(NOT STATIC AND UNIX)
-  foreach(mod IN LISTS MODULES_DETECTED)
-    set(mod_lib ${mod}${CMAKE_SHARED_MODULE_SUFFIX})
-    add_custom_command(
-      TARGET baresip_exe POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E create_symlink
-        ${CMAKE_CURRENT_BINARY_DIR}/modules/${mod}/${mod_lib}
-        ${CMAKE_CURRENT_BINARY_DIR}/${mod_lib}
-    )
-  endforeach()
-  foreach(mod IN LISTS APP_MODULES)
-    set(mod_lib ${mod}${CMAKE_SHARED_MODULE_SUFFIX})
-    add_custom_command(
-      TARGET baresip_exe POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E create_symlink
-        ${CMAKE_CURRENT_BINARY_DIR}/app_modules/${mod}/${mod_lib}
-        ${CMAKE_CURRENT_BINARY_DIR}/${mod_lib}
-    )
-  endforeach()
-endif()
-
 
 ##############################################################################
 #

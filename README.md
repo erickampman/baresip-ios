@@ -12,7 +12,7 @@ Distributed under BSD license
 ## Notes for re-ios (Eric Kampman fork)
 This is not, and is not intended to be, a complete port. 
 I need only SIP and RTP support (and encrypted versions thereof. 
-As of 2025 03 26 it is only half-baked and should be left in the oven.
+- 2025-03-28 -- libre.a is successfully built. See notes.txt for build instructions.
 
 ![Build](https://github.com/baresip/baresip/workflows/Build/badge.svg)
 ![Lint](https://github.com/baresip/baresip/workflows/lint/badge.svg)

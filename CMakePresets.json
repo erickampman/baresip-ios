@@ -16,6 +16,13 @@
         "STATIC": "ON"
       }
     }
+  ],
+    "buildPresets": [
+    {
+      "name": "ios-xcode",
+      "configurePreset": "ios-xcode",
+      "configuration": "Release"
+    }
   ]
 }
 
