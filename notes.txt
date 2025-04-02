@@ -3,3 +3,17 @@ cmake --preset ios-xcode
 cmake --build --preset ios-xcode --config Release
 find build-ios-baresip -name "libbaresip.a"
 
+
+rm -rf build-ios-baresip-sim
+cmake --preset ios-xcode-sim
+cmake --build --preset ios-xcode-sim --config Release
+lipo -info build-ios-baresip-sim/Release/Release/libbaresip.a
+
+# xcframework:
+
+xcodebuild -create-xcframework \
+  -library build-ios-baresip/Release/Release/libbaresip.a \
+  -headers include \
+  -library build-ios-baresip-sim/Release/Release/libbaresip.a \
+  -headers include \
+  -output baresip.xcframework

@@ -15,12 +15,29 @@
         "CMAKE_TOOLCHAIN_FILE": "cmake/ios.toolchain.cmake",
         "STATIC": "ON"
       }
+    },
+    {
+      "name": "ios-xcode-sim",
+      "displayName": "iOS Simulator Xcode Project",
+      "generator": "Xcode",
+      "description": "Build baresip for iOS simulator (fat binary)",
+      "binaryDir": "${sourceDir}/build-ios-baresip-sim",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake/ios.toolchain.cmake",
+        "CMAKE_OSX_SYSROOT": "iphonesimulator",
+        "STATIC": "ON"
+      }
     }
   ],
-    "buildPresets": [
+  "buildPresets": [
     {
       "name": "ios-xcode",
       "configurePreset": "ios-xcode",
+      "configuration": "Release"
+    },
+    {
+      "name": "ios-xcode-sim",
+      "configurePreset": "ios-xcode-sim",
       "configuration": "Release"
     }
   ]
