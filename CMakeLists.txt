@@ -218,6 +218,21 @@ set(SRCS
 set(HEADERS
   include/baresip.h
 )
+##############################################################################
+#
+# extra c files to compile -- not sure why they are missing
+#
+
+set(MODULE_SRCS
+    modules/contact/contact.c
+    modules/g711/g711.c
+    modules/srtp/srtp.c
+    modules/srtp/sdes.c
+    modules/uuid/uuid.c
+)
+
+list(APPEND SRCS ${MODULE_SRCS})
+
 
 ##############################################################################
 #

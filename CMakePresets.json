@@ -13,7 +13,8 @@
       "binaryDir": "${sourceDir}/build-ios-baresip",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "cmake/ios.toolchain.cmake",
-        "STATIC": "ON"
+        "STATIC": "ON",
+        "IOS_PLATFORM": "OS"
       }
     },
     {
@@ -25,7 +26,8 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "cmake/ios.toolchain.cmake",
         "CMAKE_OSX_SYSROOT": "iphonesimulator",
-        "STATIC": "ON"
+        "STATIC": "ON",
+        "IOS_PLATFORM": "SIMULATOR"
       }
     }
   ],
