@@ -1,3 +1,6 @@
+The root directories of openssl, baresip-ios, and re-ios must be in the same directories for the below to work. 
+I don't have specific info on how to build openssl for IOS. It wasn't difficult though.
+
 rm -rf build-ios-baresip
 cmake --preset ios-xcode
 cmake --build --preset ios-xcode --config Release
